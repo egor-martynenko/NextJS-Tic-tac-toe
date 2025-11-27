@@ -51,9 +51,16 @@ async function addSession(user: UserEntity) {
   }
 }
 
-async function deleteSession() {
-  const cookieStore = await cookies();
-  cookieStore.delete("session");
+async function getDeleteSessionAction() {
+  return {
+    name: "session",
+    options: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    },
+  };
 }
 
 const getSessionCookies = () => cookies().then((c) => c.get("session")?.value);
@@ -69,4 +76,8 @@ const verifySession = async (getCookies = getSessionCookies) => {
   return { isAuth: true, session: session.value };
 };
 
-export const sessionService = { addSession, deleteSession, verifySession };
+export const sessionService = {
+  addSession,
+  getDeleteSessionAction,
+  verifySession,
+};
